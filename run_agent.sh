@@ -1,5 +1,4 @@
-#! /usr/bin/env nix-shell
-#! nix-shell -i bash shell.nix
+#! /usr/bin/env bash
 
 cd "$(dirname $1)"
 echo "Running '$1'..."
