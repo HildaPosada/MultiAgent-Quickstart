@@ -1,0 +1,73 @@
+applications:
+  - id: "app"
+    name: "Default Application"
+    description: "Default application for testing"
+    privacyKeys:
+      - "priv"
+
+registry:
+  interface:
+    options:
+      - name: "API_KEY"
+        type: "string"
+        description: "OpenAI API Key"
+
+    runtime:
+      type: "executable"
+      command: [ "bash", "-c", "../run_agent.sh ../agents/interface/main.py" ]
+      environment:
+        - option: "API_KEY"
+        - name: "MODEL_NAME"
+          value: "gpt-4.1"
+        - name: "MODEL_PROVIDER"
+          value: "openai"
+        - name: "MODEL_TOKEN"
+          value: "16000"
+        - name: "MODEL_TEMPERATURE"
+          value: "0.3"
+
+  github:
+    options:
+      - name: "API_KEY"
+        type: "string"
+        description: "API key for the service"
+      - name: "GITHUB_PERSONAL_ACCESS_TOKEN"
+        type: "string"
+        description: "Github token for the service"
+    runtime:
+      type: "executable"
+      command: [ "bash", "-c", "../run_agent.sh ../agents/github/main.py" ]
+      environment:
+        - option: "API_KEY"
+        - option: "GITHUB_PERSONAL_ACCESS_TOKEN"
+        - name: "MODEL_NAME"
+          value: "gpt-4.1"
+        - name: "MODEL_PROVIDER"
+          value: "openai"
+        - name: "MODEL_TOKEN"
+          value: "16000"
+        - name: "MODEL_TEMPERATURE"
+          value: "0.3"
+
+  firecrawl:
+    options:
+      - name: "API_KEY"
+        type: "string"
+        description: "API key for the service"
+      - name: "FIRECRAWL_API_KEY"
+        type: "string"
+        description: "FIRECRAWL API KEY for the service"
+    runtime:
+      type: "executable"
+      command: ["bash", "-c", "../run_agent.sh ../agents/firecrawl/main.py"]
+      environment:
+        - option: "API_KEY"
+        - option: "FIRECRAWL_API_KEY"
+        - name: "MODEL_NAME"
+          value: "gpt-4.1"
+        - name: "MODEL_PROVIDER"
+          value: "openai"
+        - name: "MODEL_TOKEN"
+          value: "16000"
+        - name: "MODEL_TEMPERATURE"
+          value: "0.3"
