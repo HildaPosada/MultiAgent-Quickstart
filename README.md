@@ -87,7 +87,7 @@ The application.yaml file is at coral-server/src/main/resources/application.yaml
 
 This step walks you through installing and running Coral Studio locally on your machine.
 
-### 1. Run coral studio
+### 1. Run with npx
 
 Open your terminal (Git Bash or PowerShell) and run:
 
@@ -112,9 +112,6 @@ You should see:
 ---
 
 ## Creating a Session
-After editing your `application.yaml` file, the server will have hot-reloaded the changes, and you can now create a session to connect your agents.
-
-> You can check the coral server logs in the terminal where you started it. You should see messages indicating that the agents have been loaded successfully.
 
 ![Creating Session in UI](./assets/gifs/creating_session.gif)
 
