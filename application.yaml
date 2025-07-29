@@ -27,6 +27,10 @@ registry:
         type: "string"
         description: "What model temperature to use"
         default: "0.3"
+      - name: "TIMEOUT_MS"
+        type: "number"
+        description: "Connection/tool timeouts in ms"
+        default: 60000
 
     runtime:
       type: "executable"
@@ -37,6 +41,7 @@ registry:
         - option: "MODEL_PROVIDER"
         - option: "MODEL_TOKEN_LIMIT"
         - option: "MODEL_TEMPERATURE"
+        - option: "TIMEOUT_MS"
 
   github:
     options:
@@ -62,6 +67,10 @@ registry:
         type: "string"
         description: "What model temperature to use"
         default: "0.3"
+      - name: "TIMEOUT_MS"
+        type: "number"
+        description: "Connection/tool timeouts in ms"
+        default: 300
     runtime:
       type: "executable"
       command: [ "bash", "-c", "../run_agent.sh ../agents/github/main.py" ]
@@ -72,6 +81,7 @@ registry:
         - option: "MODEL_PROVIDER"
         - option: "MODEL_TOKEN_LIMIT"
         - option: "MODEL_TEMPERATURE"
+        - option: "TIMEOUT_MS"
 
   firecrawl:
     options:
@@ -97,6 +107,10 @@ registry:
         type: "string"
         description: "What model temperature to use"
         default: "0.3"
+      - name: "TIMEOUT_MS"
+        type: "number"
+        description: "Connection/tool timeouts in ms"
+        default: 300
     runtime:
       type: "executable"
       command: ["bash", "-c", "../run_agent.sh ../agents/firecrawl/main.py"]
@@ -107,3 +121,4 @@ registry:
         - option: "MODEL_PROVIDER"
         - option: "MODEL_TOKEN_LIMIT"
         - option: "MODEL_TEMPERATURE"
+        - option: "TIMEOUT_MS"
