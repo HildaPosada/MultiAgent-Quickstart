@@ -57,13 +57,42 @@ Alternatively, you may use Docker, but Windows users may suffer from performance
 First clone this repository:
 ```bash
 git clone https://github.com/Coral-Protocol/MultiAgent-Quickstart.git
+cd MultiAgent-Quickstart
 ```
+
+After cloning that, cd in and clone the server:
+
+```bash
+git clone -b stabletutorial https://github.com/Coral-Protocol/coral-server
+```
+
+Lastly you will need the agents. cd into `agents` and clone the agent repos.
+
+```bash
+cd agents
+git clone -b stabletutorial https://github.com/Coral-Protocol/Coral-GithubMCP-Agent.git github
+git clone -b stabletutorial https://github.com/Coral-Protocol/Coral-FirecrawlMCP-Agent.git firecrawl
+git clone -b stabletutorial https://github.com/Coral-Protocol/Coral-Interface-Agent.git interface
+```
+
+Once you've cloned everything, your file structure should look like this:
+
+```
+MultiAgent-Quickstart/
+├── coral-server/
+├── agents/
+│   ├── github/
+│   ├── firecrawl/
+│   └── interface/
+├── ...
+```
+
 
 ## Run Coral Server
 
 **Coral Server** is the engine that runs your multi-agent sessions, executes agent logic, and facilitates communication between agents.
 
-In this step, you'll set up and start Coral Server locally, with the config path pointed at the repository root, so it uses our provided `application.yaml` config.
+In this step, you'll set up and start Coral Server locally, with the config path pointed at the repository root, so it uses our provided `application.yaml` config. Without specifying a path, the internal example application yml would be used, which won't have the agents we want on it.
 
 ### 1. Run the Coral Server from source
 
@@ -76,8 +105,6 @@ CONFIG_PATH=.. ./gradlew run
 
 This will launch the server,
 which acts as a control plane that manages networks of agents, and facilitates their communication and collaboration.
-
-The application.yaml file is at coral-server/src/main/resources/application.yaml. This is where the agents are defined, think of it like a docker image registry, but for agents that might be running outside docker or in docker, or via another runtime.
 
 ---
 
@@ -105,18 +132,18 @@ You should see:
 - An option to create a session or connect to Coral Server
 - A visual interface to observe and interact with threads and agents
 
-[//]: # (Coral-UI should look like this)
-
-[//]: # (<img width="957" alt="Image" src="https://github.com/user-attachments/assets/819ce48e-b740-459f-a0aa-9eb23ec66c1f" />)
-
 ---
 
 ## Creating a Session
+### What is a Session?
+In short, sessions are what applications work with to create and manage the lifecycle of a given graph of agents. If you're familiar with Kubernetes, they could be thought of as custom resources that create agents all in a unique shared namespace.
 
-![Creating Session in UI](./assets/gifs/creating_session.gif)
+Sessions are created through a REST interface on the coral server, usually on-demand in response to a user's interaction or other event from the core business logic of a software service.
+
+Read more about sessions on Coral's docs [here](https://docs.coralprotocol.org/CoralDoc/CoreConcepts/Sessions).
 
 ### Creating a session via Coral Studio
-In production, you would typically just make a POST request using your preferred HTTP client library from your application code.
+In production, you would typically just make a POST request using your preferred HTTP client library from your application's backend code.
 
 For development purposes it makes sense to use Curl, Postman, or the Coral Studio UI to create sessions.
 
@@ -125,34 +152,159 @@ Let's use the Coral Studio UI to create a session.
 First, we need to connect to our Coral Server:
 
 - Click on the server selector, and press 'Add a server'
-[TODO: add screenshot of 'Add a server' option]
+![The server selector](images/server-selector.png)
+
 - For the host, enter `localhost:5555`, and press 'Add'.
+![Add a server dialog box](images/add-a-server.png)
 
 Now we can create the session:
 
 - Click on 'Select session', and then 'New session'
+- ![select session](images/select-session.png)
 - Make sure 'Application ID' and 'Privacy Key' match what you have in your `application.yaml`
     - If you're using our provided config, `app` and `priv` work.
+    ![app id and priv key inputs](images/app-priv.png)
 
 Now we pick our agents:
 
 - Click the 'New agent' under, and select 'interface'
+- ![new agent dropdown](images/new-agent.png)
 - Fill in the needed API keys
     - For OpenAI, see [this page](https://platform.openai.com/api-keys)
     - For Firecrawl, see [their website](https://www.firecrawl.dev/)
-    - For GitHub, see [this guide](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token) (make sure to only allow read-only permissions!)
+    - For GitHub, see [this guide](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token) (make sure to *only* allow read-only permissions!)
 - For the 'interface' agent specifically, we need to add the user input custom tools:
     - Go to the 'Custom Tools' section, and in the dropdown, select both 'request-question' and 'answer-question'
-- Feel free to add some extra prompts to finetune agent behaviour
+    ![custom tools dropdown](images/add-custom-tools.png)
+- Repeat for the other 2 agents ('github' & 'firecrawl')
+
+> Feel free to add some extra prompts to fine-tune agent behaviour!
 
 With all our agents ready, we need to make a group - to indicate that all of these agents can interact:
 
 - Go to the 'Groups' section, and click 'New group'
+- ![new group button](images/new-group-button.png)
 - Click on 'Empty group', and select all of our agents
+- ![all agents selected in our group](images/agent-groups.png)
 
 > You can also copy the resulting JSON from the 'Export' section - to easily import all of these settings again in future.
 
 
 Click on 'Create', and your session should spin up!
 
+### Interact with them through Coral Studio
+
+Coral Studio is filling in for the interface a production application would have here. You can see in the `/sessions` POST that gets sent when you create a session (observable via the browser's network tab), that the custom tools are brought in this way:
+
+```json
+{
+  "agentGraph": {
+    "agents": {
+      "interface": {
+        "options": {
+          "MODEL_API_KEY": "..."
+        },
+        "type": "local",
+        "agentType": "interface",
+        "tools": [
+          "user-input-respond",
+          "user-input-request"
+        ]
+      },
+      "github": {
+        "options": {
+          "MODEL_API_KEY": "...",
+          "GITHUB_PERSONAL_ACCESS_TOKEN": "..."
+        },
+        "type": "local",
+        "agentType": "github",
+        "tools": []
+      },
+      "firecrawl": {
+        "options": {
+          "MODEL_API_KEY": "...",
+          "FIRECRAWL_API_KEY": "..."
+        },
+        "type": "local",
+        "agentType": "firecrawl",
+        "tools": []
+      }
+    },
+    "links": [
+      [
+        "firecrawl",
+        "github",
+        "interface"
+      ]
+    ],
+    "tools": {
+      "user-input-respond": {
+        "transport": {
+          "type": "http",
+          "url": "http://localhost:5173/api/mcp-tools/user-input-respond"
+        },
+        "toolSchema": {
+          "name": "answer-question",
+          "description": "Answer the last question you requested from the user. You can only respond once, and will have to request more input later.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "response": {
+                "type": "string",
+                "description": "Answer to show to the user."
+              }
+            },
+            "required": [
+              "response"
+            ]
+          }
+        }
+      },
+      "user-input-request": {
+        "transport": {
+          "type": "http",
+          "url": "http://localhost:5173/api/mcp-tools/user-input-request"
+        },
+        "toolSchema": {
+          "name": "request-question",
+          "description": "Request a question from the user. Hangs until input is received.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string",
+                "description": "Message to show to the user."
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+Note the `"tools"` object. 
+
+Since the agents are being made with an environment variable pointing to their personal MCP server address on their Coral server, other tools are also possible to be brought in for individual agents.
+
+In this case, this custom input tool which maps to a HTTP request back to coral studio is being provided to the agent.
+
+#### Navigating to input tool queries
+Once you created the session, each agent was instantiated and began iterating in their loops, freely communicating and taking actions.
+
 When the interface agent is ready, it'll call our custom 'request-question' tool, and a notification will appear in the 'Tools > User Input' tab in your sidebar.
+![user input tool page](images/user-input.png)
+
+After sending your response, under the hood the blocking tool call will finally return.
+
+The interface agent then will continue operating in its loop until it requests input again or shuts down.
+
+#### Observing agent collaboration
+
+You can see the agents collaborating to fulfill the user query by selecting a session, expanding the "Threads" collapsible section and clicking into an individual thread.
+
+Since we gave them an 'answer-question' tool, the interface agent will use that once it is satisfied with a response to give the user.
+
+#### Next steps
+
+Graduating your application out of requiring Coral Studio to interact with is simply a matter of 
