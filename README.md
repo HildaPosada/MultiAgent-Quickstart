@@ -172,6 +172,7 @@ Now we can create the session:
 Now we pick our agents:
 
 - Click the 'New agent' under, and select 'interface'
+
  ![new agent dropdown](images/new-agent.png)
 - Fill in the needed API keys
     - For OpenAI, see [this page](https://platform.openai.com/api-keys)
