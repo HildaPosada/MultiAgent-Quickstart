@@ -126,7 +126,7 @@ This will start the Studio UI at [`http://127.0.0.1:3000`](http://127.0.0.1:3000
 
 Open this URL in your web browser to access the Coral Studio interface.
 
-### 2. Confirm It's Working
+### 2. Confirm it's Working
 You should see:
 - A dashboard for Coral Studio
 - An option to create a session or connect to Coral Server
@@ -142,7 +142,7 @@ Sessions are created through a REST interface on the coral server, usually on-de
 
 Read more about sessions on Coral's docs [here](https://docs.coralprotocol.org/CoralDoc/CoreConcepts/Sessions).
 
-### Creating a session via Coral Studio
+### Creating a Session via Coral Studio
 In production, you would typically just make a POST request using your preferred HTTP client library from your application's backend code.
 
 For development purposes it makes sense to use Curl, Postman, or the Coral Studio UI to create sessions.
@@ -152,15 +152,17 @@ Let's use the Coral Studio UI to create a session.
 First, we need to connect to our Coral Server:
 
 - Click on the server selector, and press 'Add a server'
+
 ![The server selector](images/server-selector.png)
 
 - For the host, enter `localhost:5555`, and press 'Add'.
+
 ![Add a server dialog box](images/add-a-server.png)
 
 Now we can create the session:
 
 - Click on 'Select session', and then 'New session'
-- ![select session](images/select-session.png)
+  ![select session](images/select-session.png)
 - Make sure 'Application ID' and 'Privacy Key' match what you have in your `application.yaml`
     - If you're using our provided config, `app` and `priv` work.
     ![app id and priv key inputs](images/app-priv.png)
@@ -168,7 +170,7 @@ Now we can create the session:
 Now we pick our agents:
 
 - Click the 'New agent' under, and select 'interface'
-- ![new agent dropdown](images/new-agent.png)
+ ![new agent dropdown](images/new-agent.png)
 - Fill in the needed API keys
     - For OpenAI, see [this page](https://platform.openai.com/api-keys)
     - For Firecrawl, see [their website](https://www.firecrawl.dev/)
@@ -183,9 +185,9 @@ Now we pick our agents:
 With all our agents ready, we need to make a group - to indicate that all of these agents can interact:
 
 - Go to the 'Groups' section, and click 'New group'
-- ![new group button](images/new-group-button.png)
+![new group button](images/new-group-button.png)
 - Click on 'Empty group', and select all of our agents
-- ![all agents selected in our group](images/agent-groups.png)
+![all agents selected in our group](images/agent-groups.png)
 
 > You can also copy the resulting JSON from the 'Export' section - to easily import all of these settings again in future.
 
@@ -289,7 +291,7 @@ Since the agents are being made with an environment variable pointing to their p
 
 In this case, this custom input tool which maps to a HTTP request back to coral studio is being provided to the agent.
 
-#### Navigating to input tool queries
+#### Navigating to Input Tool Queries
 Once you created the session, each agent was instantiated and began iterating in their loops, freely communicating and taking actions.
 
 When the interface agent is ready, it'll call our custom 'request-question' tool, and a notification will appear in the 'Tools > User Input' tab in your sidebar.
@@ -299,12 +301,50 @@ After sending your response, under the hood the blocking tool call will finally 
 
 The interface agent then will continue operating in its loop until it requests input again or shuts down.
 
-#### Observing agent collaboration
+#### Observing Agent Collaboration
 
 You can see the agents collaborating to fulfill the user query by selecting a session, expanding the "Threads" collapsible section and clicking into an individual thread.
 
 Since we gave them an 'answer-question' tool, the interface agent will use that once it is satisfied with a response to give the user.
 
-#### Next steps
+### Next Steps
+By now, you should have a working multi-agent system that can interact with users and each other.
 
-Graduating your application out of requiring Coral Studio to interact with is simply a matter of 
+Since the agents are running from source, you can modify their code and configuration to change their behavior by directly editing the agent source code in the `agents` directory.
+
+For quickly iterating individual agent changes, check out [Devmode](https://docs.coralprotocol.org/CoralDoc/Introduction/UsingAgents#devmode) in the Coral docs.
+
+To add a new agent:
+1. Clone the agent repository into the `agents` directory (Or wherever you want to keep your agent sources).
+2. Add the agent to the `application.yaml` config file under the `agents` section.
+3. Modify your Session POST request to include the new agent in the `agentGraph` section.
+
+You can ask for help and share what you have made in the [Coral Protocol Discord](https://discord.gg/MqcwYy6gxV)
+
+You may be interested in the [Production Deployments](#production-deployments) section below, which covers how to run Coral in production environments.
+
+---
+
+## Production Deployments
+
+### Runtimes
+So far we've been using the Executable runtime, which is great for development and testing to run source code directly.
+But as mentioned earlier, in production, you should use another runtime.
+
+Using the Docker runtime is detailed [here](https://docs.coralprotocol.org/CoralDoc/Introduction/UsingAgents#docker).
+
+The only difference is that a docker image tag is used instead of a source code path. Coral Server when then interact with the Docker daemon to run the agent in a container when a session is created.
+
+### Backend
+In production, you would typically have a backend service that manages sessions and interacts with a Coral Server via its REST API.
+Coral imposes no restrictions on how you implement your backend, so you can use any language or framework you're comfortable with. It just needs to make HTTP requests to a Coral Server's endpoints.
+
+At deployment time, the coral server needs to be deployed alongside your backend service, and the backend service needs to be able to connect to it. With Kubernetes, this means adding a Service to your cluster that points to the Coral Server pod. Coral Server instances for your application should not be exposed to the public internet, as they are not meant to be directly interacted with by users.
+The Coral Server will also need a Docker socket to run agents in containers, so you will need to mount a Docker socket into the Coral Server pod. 
+
+A Kubernetes runtime is in development along with other convenient runtime options, so keep an eye on the [Coral Server GitHub](https://github.com/Coral-Protocol/coral-server).
+
+### Frontends
+Coral also does not impose any restrictions on how you implement your frontend. You can use any framework or library you're comfortable with.
+
+It is important to note that unlike Coral Studio, a frontend should not directly interact with the Coral Server. Instead, it should interact with your backend service, which in turn interacts with the Coral Server. Coral Studio is a development tool, and does actually have its own backend service that it uses to interact with the Coral Server, though it assumes that the Coral Server is running in the same private network.
