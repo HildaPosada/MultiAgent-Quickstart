@@ -162,9 +162,11 @@ First, we need to connect to our Coral Server:
 Now we can create the session:
 
 - Click on 'Select session', and then 'New session'
+
   ![select session](images/select-session.png)
 - Make sure 'Application ID' and 'Privacy Key' match what you have in your `application.yaml`
     - If you're using our provided config, `app` and `priv` work.
+
     ![app id and priv key inputs](images/app-priv.png)
 
 Now we pick our agents:
@@ -177,6 +179,7 @@ Now we pick our agents:
     - For GitHub, see [this guide](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token) (make sure to *only* allow read-only permissions!)
 - For the 'interface' agent specifically, we need to add the user input custom tools:
     - Go to the 'Custom Tools' section, and in the dropdown, select both 'request-question' and 'answer-question'
+ 
     ![custom tools dropdown](images/add-custom-tools.png)
 - Repeat for the other 2 agents ('github' & 'firecrawl')
 
@@ -185,8 +188,10 @@ Now we pick our agents:
 With all our agents ready, we need to make a group - to indicate that all of these agents can interact:
 
 - Go to the 'Groups' section, and click 'New group'
+
 ![new group button](images/new-group-button.png)
 - Click on 'Empty group', and select all of our agents
+
 ![all agents selected in our group](images/agent-groups.png)
 
 > You can also copy the resulting JSON from the 'Export' section - to easily import all of these settings again in future.
