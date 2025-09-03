@@ -27,9 +27,9 @@ These are required to run agents, Coral Server, Coral Studio, and external LLMs 
 | Tool | Version | Why You Need It                                             |
 |------|---------|-------------------------------------------------------------|
 | **Python** | 3.10+ | Needed for the agents in this guide         |
-| **uv** | latest | Python environment & dependency manager ([install guide](https://docs.astral.sh/uv/getting-started/installation/)) |
+| **uv** | latest | Python environment & dependency manager ([install guide](https://docs.astral.sh/uv/getting-started/installation/)). **Ensure it's installed globally, not as part of a specific python context.** |
 | **Node.js** | 18+ | Required to run Coral Studio (the UI)                       |
-| **npm** | Comes with Node | Used to install and run Studio dependencies                 |
+| **yarn** | Comes with Node | Used to install and run Studio dependencies                 |
 | **Git** | latest | To clone agent and Coral repos                              |
 | **OpenAI API Key** | Any | Needed for agents using OpenAI models (GPT)                 |
 
@@ -114,15 +114,28 @@ which acts as a control plane that manages networks of agents, and facilitates t
 
 This step walks you through installing and running Coral Studio locally on your machine.
 
-### 1. Run with npx
+### 1. Run with yarn
 
 Open your terminal (Git Bash or PowerShell) and run:
 
+First, clone coral studio:
 ```bash
-npx @coral-protocol/coral-studio
+git clone https://github.com/Coral-Protocol/coral-studio
+cd coral-studio
+git checkout f438ff26893948b07bdd76a1733749f256b18636
 ```
 
-This will start the Studio UI at [`http://127.0.0.1:3000`](http://127.0.0.1:3000)
+Then install the dependencies:
+```bash
+yarn install
+```
+
+Then to run it from source, do this:
+```
+yarn dev
+```
+
+This will start the Studio UI at [`http://127.0.0.1:5173`](http://127.0.0.1:5173)
 
 Open this URL in your web browser to access the Coral Studio interface.
 
