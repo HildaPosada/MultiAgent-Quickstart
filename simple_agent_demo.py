@@ -607,9 +607,9 @@ class DemoWebHandler(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(data).encode())
 
 def start_server():
-    server = HTTPServer(('0.0.0.0', 8080), DemoWebHandler)
+    server = HTTPServer(('0.0.0.0', 8000), DemoWebHandler)
     print("\n🚀 Internet of Agents Demo Server Starting...")
-    print("📍 Server running on http://localhost:8080")
+    print("📍 Server running on http://localhost:8000")
     print("🔗 Codespaces will auto-forward this port for demo access")
     print("🤖 3 agents ready: Search, Summarizer, Validator")
     print("\n✨ Ready for hackathon demo!\n")
