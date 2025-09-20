@@ -494,7 +494,6 @@ class DemoWebHandler(BaseHTTPRequestHandler):
             }
             
             currentQuery = query;
-            currentResultCount = 0; // Reset counter for this new query
             
             const btn = document.getElementById('searchBtn');
             const status = document.getElementById('status');
@@ -531,8 +530,6 @@ class DemoWebHandler(BaseHTTPRequestHandler):
                 btn.innerHTML = 'Research';
             }
         }
-        
-        let currentResultCount = 0;
         
         async function pollResults() {
             try {
