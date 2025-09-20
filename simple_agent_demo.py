@@ -1,3 +1,6 @@
+# File 2: simple_agent_demo.py
+# A working demo that doesn't require Coral Protocol setup
+
 import asyncio
 import json
 from datetime import datetime
@@ -22,6 +25,11 @@ class SearchAgent(SimpleAgent):
         super().__init__("Search", ["web_search", "information_retrieval"])
     
     def process(self, query):
+        # NEW: Log what was received
+        print(f"📨 {self.name} Agent received: '{query}' (type: {type(query).__name__})")
+        print(f"🔄 {self.name} Agent processing search request...")
+        
+        # Your existing code stays the same
         print(f"🔍 {self.name} Agent: Searching for '{query}'")
         time.sleep(1)  # Simulate processing time
         
@@ -44,19 +52,30 @@ class SearchAgent(SimpleAgent):
             }
         ]
         
-        return {
+        result = {
             "agent": self.name,
             "task": "search_completed",
             "query": query,
             "results": results,
             "timestamp": datetime.now().isoformat()
         }
+        
+        # NEW: Log what's being sent to next agent
+        print(f"📤 {self.name} Agent sending {len(results)} results to Summarizer Agent")
+        print(f"🔗 Agent communication: Search → Summarizer")
+        
+        return result
 
 class SummarizerAgent(SimpleAgent):
     def __init__(self):
         super().__init__("Summarizer", ["text_analysis", "content_summarization"])
     
     def process(self, search_data):
+        # NEW: Log what was received
+        print(f"📨 {self.name} Agent received: Search data with {len(search_data.get('results', []))} sources")
+        print(f"🔄 {self.name} Agent processing summarization...")
+        
+        # Your existing code stays the same
         print(f"📝 {self.name} Agent: Summarizing search results")
         time.sleep(1.5)  # Simulate processing
         
@@ -76,7 +95,7 @@ class SummarizerAgent(SimpleAgent):
         summary += f"• Industry impact appears to be substantial\n\n"
         summary += f"Summary generated at: {datetime.now().strftime('%H:%M:%S')}"
         
-        return {
+        result = {
             "agent": self.name,
             "task": "summary_completed", 
             "original_query": query,
@@ -84,12 +103,23 @@ class SummarizerAgent(SimpleAgent):
             "source_count": len(results),
             "timestamp": datetime.now().isoformat()
         }
+        
+        # NEW: Log what's being sent to next agent
+        print(f"📤 {self.name} Agent sending summary ({len(summary)} chars) to Validator Agent")
+        print(f"🔗 Agent communication: Summarizer → Validator")
+        
+        return result
 
 class ValidatorAgent(SimpleAgent):
     def __init__(self):
         super().__init__("Validator", ["fact_checking", "quality_assessment"])
     
     def process(self, summary_data):
+        # NEW: Log what was received
+        print(f"📨 {self.name} Agent received: Summary data from Summarizer Agent")
+        print(f"🔄 {self.name} Agent processing validation...")
+        
+        # Your existing code stays the same
         print(f"✅ {self.name} Agent: Validating information quality")
         time.sleep(1)  # Simulate validation
         
@@ -105,7 +135,7 @@ class ValidatorAgent(SimpleAgent):
         validated_summary += f"• Information quality: {'High' if confidence > 80 else 'Medium'}\n"
         validated_summary += f"• Validation completed: {datetime.now().strftime('%H:%M:%S')}\n"
         
-        return {
+        result = {
             "agent": self.name,
             "task": "validation_completed",
             "final_summary": validated_summary,
@@ -113,6 +143,12 @@ class ValidatorAgent(SimpleAgent):
             "quality_rating": "High" if confidence > 80 else "Medium",
             "timestamp": datetime.now().isoformat()
         }
+        
+        # NEW: Log final output
+        print(f"📤 {self.name} Agent completed validation with {confidence}% confidence")
+        print(f"🏁 Agent workflow complete: Search → Summarizer → Validator ✅")
+        
+        return result
 
 class AgentOrchestrator:
     """Coordinates the multi-agent workflow"""
@@ -125,19 +161,28 @@ class AgentOrchestrator:
     
     async def process_query(self, query):
         """Run the full multi-agent pipeline"""
-        print(f"\n🚀 Starting multi-agent research for: '{query}'")
+        print(f"\n🚀 STARTING MULTI-AGENT RESEARCH PIPELINE")
+        print(f"📋 Query: '{query}'")
+        print(f"👥 Agents: {self.search_agent.name} → {self.summarizer_agent.name} → {self.validator_agent.name}")
+        print("-" * 60)
         
         # Step 1: Search
         search_result = self.search_agent.process(query)
-        print(f"   ✓ Search completed - found {len(search_result['results'])} sources")
+        print(f"   ✓ Step 1 completed - {self.search_agent.name} Agent")
         
         # Step 2: Summarize
         summary_result = self.summarizer_agent.process(search_result)
-        print(f"   ✓ Summary completed - {len(summary_result['summary'])} characters")
+        print(f"   ✓ Step 2 completed - {self.summarizer_agent.name} Agent")
         
         # Step 3: Validate
         final_result = self.validator_agent.process(summary_result)
-        print(f"   ✓ Validation completed - {final_result['confidence_score']}% confidence")
+        print(f"   ✓ Step 3 completed - {self.validator_agent.name} Agent")
+        
+        print("-" * 60)
+        print(f"🎉 MULTI-AGENT RESEARCH COMPLETED SUCCESSFULLY!")
+        print(f"⏱️  Total pipeline time: ~3.5 seconds")
+        print(f"🤖 All 3 agents collaborated successfully")
+        print()
         
         # Store result
         complete_result = {
@@ -151,7 +196,6 @@ class AgentOrchestrator:
         }
         
         self.results_history.append(complete_result)
-        print(f"🎉 Multi-agent research completed!\n")
         
         return complete_result
 
