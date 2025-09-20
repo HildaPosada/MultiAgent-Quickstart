@@ -5,13 +5,14 @@ from simple_agent_demo import AgentOrchestrator
 app = FastAPI()
 orchestrator = AgentOrchestrator()
 
-# Full HTML UI from DemoWebHandler
+# Full HTML UI from DemoWebHandler + favicon fix
 HTML_PAGE = """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Internet of Agents - Multi-Agent Research Demo</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -94,11 +95,7 @@ HTML_PAGE = """<!DOCTYPE html>
             transition: transform 0.2s ease;
         }
         #searchBtn:hover { transform: scale(1.05); }
-        #searchBtn:disabled { 
-            opacity: 0.6; 
-            cursor: not-allowed; 
-            transform: none; 
-        }
+        #searchBtn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
         .status {
             padding: 15px;
             border-radius: 10px;
@@ -133,10 +130,7 @@ HTML_PAGE = """<!DOCTYPE html>
             font-weight: bold;
             color: #333;
         }
-        .result-time {
-            color: #666;
-            font-size: 0.9em;
-        }
+        .result-time { color: #666; font-size: 0.9em; }
         .agent-flow {
             display: flex;
             justify-content: space-between;
@@ -161,19 +155,9 @@ HTML_PAGE = """<!DOCTYPE html>
             font-family: Georgia, serif;
             line-height: 1.6;
         }
-        .loading {
-            display: inline-block;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .demo-examples {
-            margin-top: 15px;
-            font-size: 0.9em;
-            color: #666;
-        }
+        .loading { display: inline-block; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .demo-examples { margin-top: 15px; font-size: 0.9em; color: #666; }
         .example-queries {
             display: flex;
             flex-wrap: wrap;
@@ -187,10 +171,7 @@ HTML_PAGE = """<!DOCTYPE html>
             cursor: pointer;
             transition: background 0.2s ease;
         }
-        .example-query:hover {
-            background: #667eea;
-            color: white;
-        }
+        .example-query:hover { background: #667eea; color: white; }
     </style>
 </head>
 <body>
@@ -219,7 +200,7 @@ HTML_PAGE = """<!DOCTYPE html>
         <div class="search-section">
             <h3 style="margin-bottom: 15px; color: #333;">Start Your Research</h3>
             <div class="search-form">
-                <input type="text" id="queryInput" placeholder="Enter your research question (e.g., artificial intelligence, climate change, blockchain technology...)" />
+                <input type="text" id="queryInput" placeholder="Enter your research question..." />
                 <button id="searchBtn" onclick="startResearch()">Research</button>
             </div>
             <div class="demo-examples">
@@ -260,13 +241,11 @@ HTML_PAGE = """<!DOCTYPE html>
             }
             
             currentQuery = query;
-            
             const btn = document.getElementById('searchBtn');
             const status = document.getElementById('status');
             
             btn.disabled = true;
             btn.innerHTML = '<span class="loading">⟳</span> Researching...';
-            
             status.className = 'status processing';
             status.innerHTML = '🚀 Multi-agent research started...';
             
@@ -316,7 +295,6 @@ HTML_PAGE = """<!DOCTYPE html>
         
         function displayResults(results) {
             const resultsDiv = document.getElementById('results');
-            
             resultsDiv.innerHTML = results.slice(-3).reverse().map(result => `
                 <div class="result-item">
                     <div class="result-header">
@@ -334,9 +312,7 @@ HTML_PAGE = """<!DOCTYPE html>
         }
         
         document.getElementById('queryInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                startResearch();
-            }
+            if (e.key === 'Enter') startResearch();
         });
         
         window.addEventListener('load', function() {
@@ -373,4 +349,3 @@ async def research(request: Request):
         return JSONResponse({"error": "Query required"}, status_code=400)
     result = await orchestrator.process_query(query)
     return result
- 
