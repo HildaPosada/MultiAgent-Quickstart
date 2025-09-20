@@ -16,6 +16,6 @@ git clone [your-repo-url]
 cd [your-repo-name]
 python simple_agent_demo.py
 
-# Open http://localhost:8080
+# Open http://localhost:8000
 
 [Moved to here](https://github.com/Coral-Protocol/Multi-Agent-Demo)
