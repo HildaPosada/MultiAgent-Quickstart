@@ -373,3 +373,4 @@ async def research(request: Request):
         return JSONResponse({"error": "Query required"}, status_code=400)
     result = await orchestrator.process_query(query)
     return result
+ 
