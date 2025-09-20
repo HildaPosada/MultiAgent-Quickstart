@@ -479,6 +479,9 @@ class DemoWebHandler(BaseHTTPRequestHandler):
     </div>
 
     <script>
+        let currentResultCount = 0;
+        let currentQuery = '';
+        
         function setQuery(query) {
             document.getElementById('queryInput').value = query;
         }
@@ -489,6 +492,9 @@ class DemoWebHandler(BaseHTTPRequestHandler):
                 alert('Please enter a research question');
                 return;
             }
+            
+            currentQuery = query;
+            currentResultCount = 0; // Reset counter for this new query
             
             const btn = document.getElementById('searchBtn');
             const status = document.getElementById('status');
@@ -508,7 +514,12 @@ class DemoWebHandler(BaseHTTPRequestHandler):
                 
                 if (response.ok) {
                     status.innerHTML = '🔍 Agents are collaborating on your research...';
-                    // Poll for results
+                    // Get current result count BEFORE starting to poll
+                    const initialResponse = await fetch('/api/results');
+                    const initialData = await initialResponse.json();
+                    currentResultCount = initialData.results ? initialData.results.length : 0;
+                    
+                    // Start polling for NEW results
                     pollResults();
                 } else {
                     throw new Error('Research failed');
@@ -521,22 +532,27 @@ class DemoWebHandler(BaseHTTPRequestHandler):
             }
         }
         
+        let currentResultCount = 0;
+        
         async function pollResults() {
             try {
                 const response = await fetch('/api/results');
                 const data = await response.json();
                 
-                if (data.results && data.results.length > 0) {
+                // Check if we have NEW results (more than we had before)
+                if (data.results && data.results.length > currentResultCount) {
                     displayResults(data.results);
+                    currentResultCount = data.results.length;
                     document.getElementById('status').className = 'status completed';
                     document.getElementById('status').innerHTML = '✅ Research completed!';
                     document.getElementById('searchBtn').disabled = false;
                     document.getElementById('searchBtn').innerHTML = 'Research';
                 } else {
-                    setTimeout(pollResults, 1000);
+                    // Keep polling every 500ms until we get a new result
+                    setTimeout(pollResults, 500);
                 }
             } catch (error) {
-                setTimeout(pollResults, 1000);
+                setTimeout(pollResults, 500);
             }
         }
         
