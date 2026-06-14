@@ -1,24 +1,48 @@
-# Internet of Agents - Multi-Agent Research Assistant
+# Multi-Agent Research System
 
-> **[Live Demo](https://multiagent-demo-sigma.vercel.app)** | Multi-Agent System Demo
+> **[Live Demo](https://multiagent-demo-sigma.vercel.app)** | Collaborative AI agents: Search, Summarize, Validate — orchestrated automatically.
 
+![Demo Screenshot](demo-screenshot.png)
 
-🏆 **Hackathon Project**: Demonstrates collaborative AI agents working together to solve real-world research tasks.
+---
 
-## 🤖 The Agent System
+## The Problem
 
-### Architecture
-- **Search Agent** 🔍: Discovers and retrieves relevant information
-- **Summarizer Agent** 📝: Creates comprehensive analysis and key insights  
-- **Validator Agent** ✅: Validates quality and provides confidence scoring
+Single LLM calls are brittle: they hallucinate, miss context, and cannot self-check. A multi-agent architecture solves this by splitting work: one agent retrieves, one synthesizes, one validates. Each specializes. The orchestrator coordinates.
 
-### Agent Collaboration Flow## 🚀 Quick Start
+## What I Built
+
+- Orchestrator routes queries to the right agent pipeline
+- Search Agent retrieves relevant facts from the knowledge base
+- Summarizer Agent synthesizes findings into a coherent response
+- Validator Agent scores confidence and flags weak claims
+- FastAPI backend (app.py) with full HTML UI
+- Built for the Coral Protocol Hackathon: Internet of Agents track
+
+## Agent Architecture
+
+```
+User Query → Orchestrator → Search Agent → Summarizer → Validator → Response
+```
+
+## Key Result
+
+**3-agent pipeline with real-time log streaming, confidence scoring, and query analytics — completable in a single browser session without any API key.**
+
+## Skills Demonstrated
+
+`Python` `FastAPI` `Multi-Agent Systems` `Agentic AI` `LLM Orchestration` `Coral Protocol`
+
+## How to Run
+
 ```bash
-# Clone and run
-git clone [your-repo-url]
-cd [your-repo-name]
-python simple_agent_demo.py
-
+pip install -r requirements.txt
+python app.py
 # Open http://localhost:8000
+```
 
-[Moved to here](https://github.com/Coral-Protocol/Multi-Agent-Demo)
+## About
+
+Built by Hilda Posada | MS Organic Chemistry, CSULB | Omdena ML Lead
+[LinkedIn](https://linkedin.com/in/hildaposada) | [GitHub](https://github.com/HildaPosada) | [Portfolio](https://hildaposada.github.io)
+
