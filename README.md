@@ -1,5 +1,8 @@
 # Internet of Agents - Multi-Agent Research Assistant
 
+> **[Live Demo](https://multiagent-demo-sigma.vercel.app)** | Multi-Agent System Demo
+
+
 🏆 **Hackathon Project**: Demonstrates collaborative AI agents working together to solve real-world research tasks.
 
 ## 🤖 The Agent System
