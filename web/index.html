@@ -229,3 +229,4 @@ async function run(){const btn=document.getElementById('run'),log=document.getEl
 function download(){if(!report){document.getElementById('result').textContent='Run a review before exporting.';return}const url=URL.createObjectURL(new Blob([JSON.stringify(report,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='data-review.json';a.click();URL.revokeObjectURL(url)}
 
 function sample(type){const clean=[{product:'Sensor A',price:24.5,stock:12},{product:'Sensor B',price:18,stock:0}];const rows=type==='missing'?[...clean,{product:'Sensor C',price:null,stock:8}]:type==='duplicate'?[...clean,clean[0]]:clean;document.getElementById('input').value=JSON.stringify(rows,null,2)}</script></body></html>
+<!-- UI refresh October 2, 2026 -->
