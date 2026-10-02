@@ -1,5 +1,11 @@
 # Multi-Agent Research System
 
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=111111)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![Vercel](https://img.shields.io/badge/Vercel-171717?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
+
+
 ## Verified deployment status · October 1, 2026
 
 The [web demo](https://multiagent-demo-sigma.vercel.app/) is a preset workflow simulation. It does not call a live search service, LLM, or Coral agent backend. Unsupported topics now display a clear message instead of fabricated research. The Python prototype requires separate integration and runtime verification.
