@@ -315,7 +315,7 @@
       <div class="result-content" id="result-summary"></div>
     </div>
     <div class="result-section">
-      <div class="result-label">Validator Agent: Confidence Score</div>
+      <div class="result-label">Validator: Illustrative Score</div>
       <div class="result-content">
         <div class="confidence-bar-wrap">
           <div class="confidence-bar-bg"><div class="confidence-bar-fill" id="conf-bar" style="width:0%"></div></div>
@@ -341,31 +341,31 @@ const KB = {
     search: ["AutoGPT and BabyAGI pioneered task-decomposition loops in 2023", "OpenAI's Assistants API uses function-calling for tool use", "LangGraph enables stateful multi-agent workflows with cycles", "Microsoft AutoGen supports multi-agent conversation frameworks", "Coral Protocol enables open-source agent interoperability"],
     summary: "LLM agent coordination has evolved rapidly from single-agent loops to sophisticated multi-agent systems. Key patterns include: (1) Supervisor + worker hierarchies where a planner delegates to specialists, (2) Peer-to-peer agent communication via shared message queues, (3) Tool-use agents that call APIs and databases, and (4) Memory-augmented agents with vector stores for long-term context. AutoGen and LangGraph are the leading open-source frameworks.",
     confidence: 91,
-    validation: "High confidence: topic well-covered in recent literature. Sources cross-referenced across 5 data points. Factual claims verified."
+    validation: "Preset example notes for this simulation. No live sources were checked and this score is not measured confidence."
   },
   "multi-agent rl": {
     search: ["MARL (Multi-Agent RL) handles cooperative and competitive settings", "AlphaStar used multi-agent self-play to master StarCraft II", "MADDPG extends DDPG to cooperative multi-agent environments", "Communication protocols between agents are an active research area", "Real-world applications: traffic control, robotics swarms, trading bots"],
     summary: "Multi-agent reinforcement learning (MARL) trains multiple autonomous agents simultaneously. In cooperative settings, agents share rewards and learn coordination strategies. In competitive settings, agents model opponents. Key algorithms: MADDPG (centralized training, decentralized execution), QMIX (value decomposition), and MAPPO (PPO for multi-agent). The main challenges are non-stationarity (other agents change the environment) and credit assignment.",
     confidence: 88,
-    validation: "Good confidence: technical claims verified. AlphaStar and MADDPG references confirmed. Non-stationarity challenge is well-established in MARL literature."
+    validation: "Preset example notes for this simulation. No live sources were checked and this score is not measured confidence."
   },
   "rag": {
-    search: ["RAG (Retrieval-Augmented Generation) grounds LLMs in retrieved documents", "Reduces hallucinations by 40-60% vs. standard prompting in enterprise tests", "Vector databases (Pinecone, Chroma, FAISS) store embeddings for fast retrieval", "LlamaIndex and LangChain are leading RAG orchestration frameworks", "Hybrid search (BM25 + dense retrieval) improves recall significantly"],
+    search: ["RAG (Retrieval-Augmented Generation) grounds LLMs in retrieved documents", "Retrieved passages can provide supporting context; quality requires evaluation", "Vector databases (Pinecone, Chroma, FAISS) store embeddings for fast retrieval", "LlamaIndex and LangChain are leading RAG orchestration frameworks", "Hybrid search (BM25 + dense retrieval) improves recall significantly"],
     summary: "Retrieval-Augmented Generation (RAG) improves LLM accuracy by retrieving relevant documents before generating a response. The pipeline: (1) Index documents as vector embeddings, (2) On query, retrieve top-k semantically similar chunks, (3) Inject chunks into the prompt as context, (4) LLM generates grounded response. RAG is now standard in enterprise AI: it reduces hallucinations, allows knowledge updates without retraining, and provides source citations.",
     confidence: 94,
-    validation: "Very high confidence: RAG is a well-documented technique. The 40-60% hallucination reduction figure is from enterprise benchmarks. All technical claims verified."
+    validation: "Preset example notes for this simulation. No live sources were checked and this score is not measured confidence."
   },
   "shap": {
     search: ["SHAP (SHapley Additive exPlanations) explains individual model predictions", "Based on cooperative game theory: Shapley values from the 1950s", "TreeSHAP runs in polynomial time for tree-based models (XGBoost, LightGBM)", "SHAP summary plots show feature importance across the full dataset", "Used in healthcare, finance, and HR to comply with explainability requirements"],
     summary: "SHAP explains ML model predictions by attributing contribution to each feature. For any prediction, SHAP answers: 'How much did each feature push the prediction up or down?' Key outputs: (1) SHAP values per feature per prediction, (2) Summary plots for global feature importance, (3) Dependence plots showing how a feature's effect changes with its value. Widely adopted for model auditing, bias detection, and regulatory compliance (GDPR, financial credit models).",
     confidence: 96,
-    validation: "Very high confidence: SHAP is a rigorous technique with peer-reviewed foundations. The Shapley value basis is mathematically proven. Practical applications well-documented."
+    validation: "Preset example notes for this simulation. No live sources were checked and this score is not measured confidence."
   },
   "churn": {
-    search: ["Customer churn prediction is a binary classification problem", "Typical models: logistic regression, XGBoost, LightGBM, neural nets", "Key features: recency, frequency, monetary value (RFM), support tickets, usage trends", "83% ROC-AUC is achievable with good feature engineering on SaaS data", "Real-time churn scoring enables proactive retention interventions"],
-    summary: "Churn prediction models estimate the probability each customer will leave. Best practices: (1) Define churn clearly (30/60/90-day inactivity), (2) Engineer behavioral features from usage logs, (3) Handle class imbalance with SMOTE or class weights, (4) Use ROC-AUC and Precision-Recall as metrics (not accuracy), (5) Deploy as a real-time scoring API. The business impact is direct: a model identifying $1.4M at-risk revenue allows the retention team to prioritize outreach by risk tier.",
+    search: ["Customer churn prediction is a binary classification problem", "Typical models: logistic regression, XGBoost, LightGBM, neural nets", "Key features: recency, frequency, monetary value (RFM), support tickets, usage trends", "Evaluate churn models on held-out data with suitable classification metrics", "Real-time churn scoring enables proactive retention interventions"],
+    summary: "Churn prediction models estimate the probability each customer will leave. Best practices: (1) Define churn clearly (30/60/90-day inactivity), (2) Engineer behavioral features from usage logs, (3) Handle class imbalance with SMOTE or class weights, (4) Use ROC-AUC and Precision-Recall as metrics (not accuracy), (5) Deploy as a real-time scoring API. Potential business impact must be tested rather than inferred from a model score.",
     confidence: 92,
-    validation: "High confidence: churn modeling is a well-established ML use case. The $1.4M at-risk revenue identification is a real-world result from Hilda's Omdena project. ROC-AUC 83% is a strong result for this domain."
+    validation: "Preset example notes for this simulation. No live sources were checked and this score is not measured confidence."
   }
 };
 
@@ -417,7 +417,7 @@ function matchKB(query) {
     ],
     summary: "The agent system analyzed your query and retrieved relevant information from its knowledge base. In a production deployment connected to live APIs and a vector database, this response would include real-time retrieved documents, cross-referenced facts, and structured citations. The multi-agent pipeline demonstrated here: Search Agent retrieves relevant chunks, Summarizer synthesizes them into a coherent response, Validator checks factual consistency and assigns a confidence score.",
     confidence: 0,
-    validation: "Moderate-to-high confidence based on query analysis. For best results, try one of the preset queries above which are grounded in the agent's knowledge base."
+    validation: "Preset example notes for this simulation. No live sources were checked and this score is not measured confidence."
   };
 }
 
