@@ -1,3 +1,10 @@
+from pathlib import Path
+import sys
+import os
+_PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(_PROJECT_ROOT))
+os.chdir(_PROJECT_ROOT)
+
 # File 2: simple_agent_demo.py
 # A working demo that doesn't require Coral Protocol setup
 
