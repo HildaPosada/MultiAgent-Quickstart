@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-Agent Research System | Hilda Posada</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0d0d0d;
+      color: #e8e8e8;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+    .container { max-width: 860px; margin: 0 auto; }
+    header { text-align: center; padding: 40px 0 32px; }
+    .badge {
+      display: inline-block;
+      background: rgba(0,200,150,0.12);
+      color: #00c896;
+      border: 1px solid rgba(0,200,150,0.3);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    h1 {
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    h1 span { color: #00c896; }
+    .subtitle {
+      color: #888;
+      font-size: 1rem;
+      max-width: 560px;
+      margin: 0 auto 32px;
+      line-height: 1.6;
+    }
+    /* Architecture diagram */
+    .arch {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 36px;
+    }
+    .agent-box {
+      background: #141414;
+      border: 1px solid #222;
+      border-radius: 10px;
+      padding: 14px 18px;
+      text-align: center;
+      min-width: 130px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .agent-box.active {
+      border-color: #00c896;
+      box-shadow: 0 0 16px rgba(0,200,150,0.2);
+    }
+    .agent-box.thinking {
+      border-color: #f59e0b;
+      box-shadow: 0 0 16px rgba(245,158,11,0.2);
+    }
+    .agent-icon { font-size: 1.6rem; margin-bottom: 6px; }
+    .agent-name { font-size: 0.78rem; font-weight: 700; color: #fff; }
+    .agent-role { font-size: 0.68rem; color: #666; margin-top: 2px; }
+    .arrow { color: #333; font-size: 1.2rem; font-weight: bold; }
+    /* Demo UI */
+    .demo-panel {
+      background: #141414;
+      border: 1px solid #222;
+      border-radius: 14px;
+      padding: 28px;
+      margin-bottom: 28px;
+    }
+    .demo-panel h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .query-input {
+      flex: 1;
+      background: #0d0d0d;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      color: #e8e8e8;
+      font-size: 0.9rem;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .query-input:focus { border-color: #00c896; }
+    .query-input::placeholder { color: #444; }
+    .run-btn {
+      background: #00c896;
+      color: #0d0d0d;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 22px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .run-btn:hover { opacity: 0.9; }
+    .run-btn:active { transform: scale(0.97); }
+    .run-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .preset-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+    .chip {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 16px;
+      color: #888;
+      font-size: 0.75rem;
+      padding: 4px 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .chip:hover { border-color: #00c896; color: #00c896; background: rgba(0,200,150,0.06); }
+    /* Log stream */
+    .log-area {
+      background: #0a0a0a;
+      border: 1px solid #1e1e1e;
+      border-radius: 8px;
+      padding: 16px;
+      min-height: 200px;
+      max-height: 320px;
+      overflow-y: auto;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.78rem;
+      line-height: 1.7;
+    }
+    .log-line { margin-bottom: 2px; }
+    .log-system { color: #555; }
+    .log-search { color: #60a5fa; }
+    .log-summarizer { color: #a78bfa; }
+    .log-validator { color: #34d399; }
+    .log-result { color: #00c896; }
+    .log-error { color: #f87171; }
+    .cursor { display: inline-block; width: 7px; height: 13px; background: #00c896; animation: blink 0.8s step-end infinite; vertical-align: middle; margin-left: 2px; }
+    @keyframes blink { 50% { opacity: 0; } }
+    /* Results panel */
+    .result-panel {
+      background: #141414;
+      border: 1px solid #222;
+      border-radius: 14px;
+      padding: 28px;
+      margin-bottom: 28px;
+      display: none;
+    }
+    .result-panel.visible { display: block; }
+    .result-panel h2 { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 16px; }
+    .result-section { margin-bottom: 20px; }
+    .result-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #00c896;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+    .result-content {
+      background: #0d0d0d;
+      border: 1px solid #1e1e1e;
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      color: #ccc;
+    }
+    .confidence-bar-wrap { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+    .confidence-bar-bg {
+      flex: 1;
+      height: 6px;
+      background: #1e1e1e;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .confidence-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #00c896, #00e6b0);
+      transition: width 0.8s ease;
+    }
+    .confidence-pct { font-size: 0.85rem; font-weight: 700; color: #00c896; }
+    /* Metrics */
+    .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 28px; }
+    .metric-card {
+      background: #141414;
+      border: 1px solid #222;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+    .metric-val { font-size: 1.6rem; font-weight: 800; color: #00c896; line-height: 1; }
+    .metric-label { font-size: 0.72rem; color: #666; margin-top: 5px; }
+    /* Footer */
+    .footer-links {
+      text-align: center;
+      padding: 20px 0;
+      border-top: 1px solid #1e1e1e;
+    }
+    .footer-links a {
+      color: #555;
+      text-decoration: none;
+      font-size: 0.8rem;
+      margin: 0 10px;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: #00c896; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="badge">Live Demo</div>
+    <h1>Multi-Agent <span>Research</span> System</h1>
+    <p class="subtitle">A browser simulation of search, summary, and validation stages using preset examples. No live search API, LLM, or Coral agent backend is connected.</p>
+  </header>
+
+  <!-- Architecture -->
+  <div class="arch">
+    <div class="agent-box" id="box-orchestrator">
+      <div class="agent-icon">🎯</div>
+      <div class="agent-name">Orchestrator</div>
+      <div class="agent-role">Routes tasks</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="agent-box" id="box-search">
+      <div class="agent-icon">🔍</div>
+      <div class="agent-name">Search Agent</div>
+      <div class="agent-role">Retrieves data</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="agent-box" id="box-summarizer">
+      <div class="agent-icon">📝</div>
+      <div class="agent-name">Summarizer</div>
+      <div class="agent-role">Analyzes & writes</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="agent-box" id="box-validator">
+      <div class="agent-icon">✅</div>
+      <div class="agent-name">Validator</div>
+      <div class="agent-role">Scores quality</div>
+    </div>
+  </div>
+
+  <!-- Metrics -->
+  <div class="metrics">
+    <div class="metric-card">
+      <div class="metric-val">3</div>
+      <div class="metric-label">Specialized Agents</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val" id="queries-run">0</div>
+      <div class="metric-label">Queries Run</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val" id="avg-confidence">–</div>
+      <div class="metric-label">Demo score</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val" id="avg-time">–</div>
+      <div class="metric-label">Avg Response (s)</div>
+    </div>
+  </div>
+
+  <!-- Input panel -->
+  <div class="demo-panel">
+    <h2>Ask the Agent System</h2>
+    <div class="preset-chips">
+      <div class="chip" onclick="setQuery('What are the latest breakthroughs in LLM agent coordination?')">LLM agent coordination</div>
+      <div class="chip" onclick="setQuery('Explain multi-agent reinforcement learning')">Multi-agent RL</div>
+      <div class="chip" onclick="setQuery('How does RAG improve AI accuracy?')">RAG + accuracy</div>
+      <div class="chip" onclick="setQuery('What is SHAP and how is it used in ML explainability?')">SHAP explainability</div>
+      <div class="chip" onclick="setQuery('Summarize churn prediction best practices')">Churn prediction</div>
+    </div>
+    <div class="input-row">
+      <input class="query-input" id="query-input" type="text" placeholder="Ask the agent system anything about AI, ML, or data science..." maxlength="200" />
+      <button class="run-btn" id="run-btn" onclick="runAgents()">Run Agents</button>
+    </div>
+    <div class="log-area" id="log-area">
+      <div class="log-line log-system">// Agent system ready. Enter a query above to begin.</div>
+    </div>
+  </div>
+
+  <!-- Result panel -->
+  <div class="result-panel" id="result-panel">
+    <h2>Agent Output</h2>
+    <div class="result-section">
+      <div class="result-label">Search Agent: Key Findings</div>
+      <div class="result-content" id="result-search"></div>
+    </div>
+    <div class="result-section">
+      <div class="result-label">Summarizer Agent: Synthesis</div>
+      <div class="result-content" id="result-summary"></div>
+    </div>
+    <div class="result-section">
+      <div class="result-label">Validator Agent: Confidence Score</div>
+      <div class="result-content">
+        <div class="confidence-bar-wrap">
+          <div class="confidence-bar-bg"><div class="confidence-bar-fill" id="conf-bar" style="width:0%"></div></div>
+          <span class="confidence-pct" id="conf-pct">0%</span>
+        </div>
+        <div style="margin-top:10px" id="result-validation"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-links">
+    <a href="https://github.com/HildaPosada/MultiAgent-Quickstart" target="_blank" rel="noopener">GitHub Repo</a>
+    <a href="https://www.linkedin.com/in/hildaposada/" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="https://hildaposada.github.io/" target="_blank" rel="noopener">Portfolio</a>
+    <span style="color:#333; margin: 0 4px;">|</span>
+    <span style="color:#555; font-size:0.78rem;">Built by Hilda Posada · MS Chemistry, CSULB · Omdena ML Lead</span>
+  </div>
+</div>
+
+<script>
+const KB = {
+  "llm agent": {
+    search: ["AutoGPT and BabyAGI pioneered task-decomposition loops in 2023", "OpenAI's Assistants API uses function-calling for tool use", "LangGraph enables stateful multi-agent workflows with cycles", "Microsoft AutoGen supports multi-agent conversation frameworks", "Coral Protocol enables open-source agent interoperability"],
+    summary: "LLM agent coordination has evolved rapidly from single-agent loops to sophisticated multi-agent systems. Key patterns include: (1) Supervisor + worker hierarchies where a planner delegates to specialists, (2) Peer-to-peer agent communication via shared message queues, (3) Tool-use agents that call APIs and databases, and (4) Memory-augmented agents with vector stores for long-term context. AutoGen and LangGraph are the leading open-source frameworks.",
+    confidence: 91,
+    validation: "High confidence: topic well-covered in recent literature. Sources cross-referenced across 5 data points. Factual claims verified."
+  },
+  "multi-agent rl": {
+    search: ["MARL (Multi-Agent RL) handles cooperative and competitive settings", "AlphaStar used multi-agent self-play to master StarCraft II", "MADDPG extends DDPG to cooperative multi-agent environments", "Communication protocols between agents are an active research area", "Real-world applications: traffic control, robotics swarms, trading bots"],
+    summary: "Multi-agent reinforcement learning (MARL) trains multiple autonomous agents simultaneously. In cooperative settings, agents share rewards and learn coordination strategies. In competitive settings, agents model opponents. Key algorithms: MADDPG (centralized training, decentralized execution), QMIX (value decomposition), and MAPPO (PPO for multi-agent). The main challenges are non-stationarity (other agents change the environment) and credit assignment.",
+    confidence: 88,
+    validation: "Good confidence: technical claims verified. AlphaStar and MADDPG references confirmed. Non-stationarity challenge is well-established in MARL literature."
+  },
+  "rag": {
+    search: ["RAG (Retrieval-Augmented Generation) grounds LLMs in retrieved documents", "Reduces hallucinations by 40-60% vs. standard prompting in enterprise tests", "Vector databases (Pinecone, Chroma, FAISS) store embeddings for fast retrieval", "LlamaIndex and LangChain are leading RAG orchestration frameworks", "Hybrid search (BM25 + dense retrieval) improves recall significantly"],
+    summary: "Retrieval-Augmented Generation (RAG) improves LLM accuracy by retrieving relevant documents before generating a response. The pipeline: (1) Index documents as vector embeddings, (2) On query, retrieve top-k semantically similar chunks, (3) Inject chunks into the prompt as context, (4) LLM generates grounded response. RAG is now standard in enterprise AI: it reduces hallucinations, allows knowledge updates without retraining, and provides source citations.",
+    confidence: 94,
+    validation: "Very high confidence: RAG is a well-documented technique. The 40-60% hallucination reduction figure is from enterprise benchmarks. All technical claims verified."
+  },
+  "shap": {
+    search: ["SHAP (SHapley Additive exPlanations) explains individual model predictions", "Based on cooperative game theory: Shapley values from the 1950s", "TreeSHAP runs in polynomial time for tree-based models (XGBoost, LightGBM)", "SHAP summary plots show feature importance across the full dataset", "Used in healthcare, finance, and HR to comply with explainability requirements"],
+    summary: "SHAP explains ML model predictions by attributing contribution to each feature. For any prediction, SHAP answers: 'How much did each feature push the prediction up or down?' Key outputs: (1) SHAP values per feature per prediction, (2) Summary plots for global feature importance, (3) Dependence plots showing how a feature's effect changes with its value. Widely adopted for model auditing, bias detection, and regulatory compliance (GDPR, financial credit models).",
+    confidence: 96,
+    validation: "Very high confidence: SHAP is a rigorous technique with peer-reviewed foundations. The Shapley value basis is mathematically proven. Practical applications well-documented."
+  },
+  "churn": {
+    search: ["Customer churn prediction is a binary classification problem", "Typical models: logistic regression, XGBoost, LightGBM, neural nets", "Key features: recency, frequency, monetary value (RFM), support tickets, usage trends", "83% ROC-AUC is achievable with good feature engineering on SaaS data", "Real-time churn scoring enables proactive retention interventions"],
+    summary: "Churn prediction models estimate the probability each customer will leave. Best practices: (1) Define churn clearly (30/60/90-day inactivity), (2) Engineer behavioral features from usage logs, (3) Handle class imbalance with SMOTE or class weights, (4) Use ROC-AUC and Precision-Recall as metrics (not accuracy), (5) Deploy as a real-time scoring API. The business impact is direct: a model identifying $1.4M at-risk revenue allows the retention team to prioritize outreach by risk tier.",
+    confidence: 92,
+    validation: "High confidence: churn modeling is a well-established ML use case. The $1.4M at-risk revenue identification is a real-world result from Hilda's Omdena project. ROC-AUC 83% is a strong result for this domain."
+  }
+};
+
+let queriesRun = 0;
+let totalConf = 0;
+let totalTime = 0;
+
+function setQuery(q) {
+  document.getElementById('query-input').value = q;
+}
+
+function log(msg, cls) {
+  const area = document.getElementById('log-area');
+  const line = document.createElement('div');
+  line.className = 'log-line ' + (cls || 'log-system');
+  line.textContent = msg;
+  area.appendChild(line);
+  area.scrollTop = area.scrollHeight;
+}
+
+function clearLog() {
+  document.getElementById('log-area').innerHTML = '';
+}
+
+function setAgentActive(id) {
+  ['orchestrator','search','summarizer','validator'].forEach(a => {
+    const el = document.getElementById('box-' + a);
+    el.classList.remove('active', 'thinking');
+  });
+  if (id) {
+    document.getElementById('box-' + id).classList.add('active');
+    if (id !== 'orchestrator') document.getElementById('box-' + id).classList.add('thinking');
+  }
+}
+
+function matchKB(query) {
+  const q = query.toLowerCase();
+  for (const key of Object.keys(KB)) {
+    if (q.includes(key)) return KB[key];
+  }
+  // fallback
+  return {
+    search: [
+      "Query analyzed across indexed knowledge base",
+      "Retrieved " + (0) + " relevant document chunks",
+      "Cross-referenced with domain-specific sources",
+      "No live corpus was searched",
+      "Preset workflow example only"
+    ],
+    summary: "The agent system analyzed your query and retrieved relevant information from its knowledge base. In a production deployment connected to live APIs and a vector database, this response would include real-time retrieved documents, cross-referenced facts, and structured citations. The multi-agent pipeline demonstrated here: Search Agent retrieves relevant chunks, Summarizer synthesizes them into a coherent response, Validator checks factual consistency and assigns a confidence score.",
+    confidence: 0,
+    validation: "Moderate-to-high confidence based on query analysis. For best results, try one of the preset queries above which are grounded in the agent's knowledge base."
+  };
+}
+
+async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function runAgents() {
+  const candidate=document.getElementById('query-input').value.toLowerCase();
+  if (!Object.keys(KB).some(key=>candidate.includes(key))) {document.getElementById('log-area').textContent='No preset example matches this query. Choose one of the examples above. Live search and LLM backends are not connected.';return;}
+
+  const query = document.getElementById('query-input').value.trim();
+  if (!query) return;
+
+  const btn = document.getElementById('run-btn');
+  btn.disabled = true;
+  const startTime = Date.now();
+
+  clearLog();
+  document.getElementById('result-panel').classList.remove('visible');
+
+  // Orchestrator
+  setAgentActive('orchestrator');
+  log('[Orchestrator] Received query: "' + query.slice(0, 60) + (query.length > 60 ? '...' : '') + '"', 'log-system');
+  await sleep(400);
+  log('[Orchestrator] Routing to Search Agent...', 'log-system');
+  await sleep(300);
+
+  // Search Agent
+  setAgentActive('search');
+  log('[Search Agent] Querying knowledge base...', 'log-search');
+  await sleep(500);
+
+  const data = matchKB(query);
+  for (let i = 0; i < data.search.length; i++) {
+    await sleep(300);
+    log('[Search Agent] ✓ ' + data.search[i], 'log-search');
+  }
+  await sleep(300);
+  log('[Search Agent] Retrieved ' + data.search.length + ' findings. Passing to Summarizer.', 'log-search');
+  await sleep(400);
+
+  // Summarizer
+  setAgentActive('summarizer');
+  log('[Summarizer] Analyzing findings...', 'log-summarizer');
+  await sleep(600);
+  log('[Summarizer] Synthesizing response...', 'log-summarizer');
+  await sleep(700);
+  log('[Summarizer] Summary complete. Passing to Validator.', 'log-summarizer');
+  await sleep(400);
+
+  // Validator
+  setAgentActive('validator');
+  log('[Validator] Displaying example validation notes...', 'log-validator');
+  await sleep(500);
+  log('[Validator] Illustrative score: ' + data.confidence + '%', 'log-validator');
+  await sleep(300);
+  log('[Validator] ' + data.validation, 'log-validator');
+  await sleep(400);
+
+  const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+  log('[Orchestrator] Pipeline complete in ' + elapsed + 's.', 'log-result');
+
+  setAgentActive(null);
+  document.getElementById('box-orchestrator').classList.add('active');
+
+  // Populate results
+  document.getElementById('result-search').innerHTML = data.search.map(s => '• ' + s).join('<br>');
+  document.getElementById('result-summary').textContent = data.summary;
+  document.getElementById('conf-bar').style.width = data.confidence + '%';
+  document.getElementById('conf-pct').textContent = data.confidence + '%';
+  document.getElementById('result-validation').textContent = data.validation;
+  document.getElementById('result-panel').classList.add('visible');
+
+  // Update metrics
+  queriesRun++;
+  totalConf += data.confidence;
+  totalTime += parseFloat(elapsed);
+  document.getElementById('queries-run').textContent = queriesRun;
+  document.getElementById('avg-confidence').textContent = Math.round(totalConf / queriesRun) + '%';
+  document.getElementById('avg-time').textContent = (totalTime / queriesRun).toFixed(1);
+
+  btn.disabled = false;
+}
+
+document.getElementById('query-input').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') runAgents();
+});
+</script>
+</body>
+</html>
