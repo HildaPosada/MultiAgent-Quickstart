@@ -6,14 +6,15 @@
 [![Vercel](https://img.shields.io/badge/Vercel-171717?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
 
 
+> **[Interactive demo](https://multiagent-demo-sigma.vercel.app/)**
+
 ## Verified deployment status · October 1, 2026
 
-The [web demo](https://multiagent-demo-sigma.vercel.app/) is a preset workflow simulation. It does not call a live search service, LLM, or Coral agent backend. Unsupported topics now display a clear message instead of fabricated research. The Python prototype requires separate integration and runtime verification.
+The web demo is a preset workflow simulation. It does not call a live search service, LLM, or Coral agent backend. Unsupported topics now display a clear message instead of fabricated research. The Python prototype requires separate integration and runtime verification.
 
 See [deployment source and scope](web/README.md) and the [portfolio audit](https://github.com/HildaPosada/hildaposada.github.io/blob/master/docs/project_audit.md). Historical descriptions below are not evidence of a connected production backend.
 
 
-> **[Live Demo](https://multiagent-demo-sigma.vercel.app)** | Collaborative AI agents: Search, Summarize, Validate — orchestrated automatically.
 
 ![Demo Screenshot](demo-screenshot.png)
 
